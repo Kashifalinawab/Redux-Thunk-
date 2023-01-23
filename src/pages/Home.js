@@ -4,6 +4,7 @@ import {
   getAsynctodo,
   addAsynctodo,
   toggleCompleteAysnctodo,
+  deleteTodoAsync,
 } from "../redux/todoSlice";
 
 function Home(props) {
@@ -11,6 +12,7 @@ function Home(props) {
   const dispatch = useDispatch();
   const todos = useSelector((state) => state.todos);
   //   console.log("Before useeffect", books);
+
   useEffect(() => {
     dispatch(getAsynctodo());
   }, [dispatch]);
@@ -25,11 +27,14 @@ function Home(props) {
     // console.log(value);
   };
 
-  const handleCheckbox = (todo) => {
+  const handleCheckbox = (id, completed, ) => {
+    // console.log(todo.id);
+    dispatch(toggleCompleteAysnctodo({ id,  completed: !completed }));
+  };
+
+  const handleDelete = (id) => {
+    dispatch(deleteTodoAsync({ id }));
     // console.log(id);
-    dispatch(
-      toggleCompleteAysnctodo({ id: todo.id, completed: !todo.completed })
-    );
   };
 
   return (
@@ -46,22 +51,24 @@ function Home(props) {
       </form>
       <br />
 
-      {todos.map((todo, index) => {
+      {todos.map((todo) => {
         return (
-          <div key={index}>
+          <div key={todo.id}>
             <p>
               {" "}
               <span>
                 <input
                   type="checkbox"
-                  onChange={() => handleCheckbox(todo)}
-                  checked={todo.completed}
+                  onClick={() =>
+                    handleCheckbox(todo.id, todo.completed, )
+                  }
+                  defaultChecked={todo.completed}
                 />
               </span>
-              Name: {todo.title}
+              Task: {todo.title}
             </p>
-            <button>Update</button>
-            <button>Delete</button>
+            {/* <p>completed:{todo.completed ? "Yes" : "No"}</p> */}
+            <button onClick={() => handleDelete(todo.id)}>Delete</button>
           </div>
         );
       })}

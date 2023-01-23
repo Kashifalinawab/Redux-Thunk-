@@ -1,9 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const intialState = [
-  
-];
+// const intialState = [];
 
 export const getAsynctodo = createAsyncThunk("todo/getAsynctodo", async () => {
   //   const response = await fetch("http://localhost:3001/books");
@@ -38,15 +36,29 @@ export const toggleCompleteAysnctodo = createAsyncThunk(
   "todos/toggleCompleteAysnctodo",
   async (payload) => {
     const response = await axios.put(
+      `http://localhost:3001/todos/${payload.id}`,
+      { completed: payload.completed }
+    );
+    // console.log(response.data);
+    return { data: response.data };
+  }
+);
+
+export const deleteTodoAsync = createAsyncThunk(
+  "todos/deleteTodoAsync",
+  async (payload) => {
+    const response = await axios.delete(
       `http://localhost:3001/todos/${payload.id}`
     );
-    console.log(response);
+    // console.log(payload.id);
+    return { data: payload.id };
+    // return { data: response.data };
   }
 );
 
 const todoSlice = createSlice({
   name: "todos",
-  initialState: intialState,
+  initialState: [],
 
   //   reducers: {
   //    addBook: (state, action) => {
@@ -65,12 +77,18 @@ const todoSlice = createSlice({
     [addAsynctodo.fulfilled]: (state, action) => {
       state.push(action.payload.data);
     },
-    // [toggleCompleteAysnctodo.fulfilled]: (state, action) => {
-    //   const index = state.findIndex(
-    //     (todo) => todo.id === action.payload.id
-    //   );
-    //   state[index].completed = action.payload.completed;
-    // },
+    [toggleCompleteAysnctodo.fulfilled]: (state, action) => {
+      const index = state.findIndex(
+        (todo) => todo.id === action.payload.data.id
+      );
+      // console.log(index);
+      state[index].completed = action.payload.completed;
+    },
+    [deleteTodoAsync.fulfilled]: (state, action) => {
+      // return action.payload.data;
+      return state.filter((todo) => todo.id !== action.payload.data);
+      // return state;
+    },
   },
 });
 
